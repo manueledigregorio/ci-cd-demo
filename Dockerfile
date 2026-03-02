@@ -13,8 +13,14 @@ RUN cp .env.example .env
 
 RUN composer install --no-interaction --prefer-dist --no-scripts
 
-RUN chown -R www-data:www-data /var/www/storage /var/www/bootstrap/cache
+# Crea il file SQLite e imposta i permessi
+RUN touch database/database.sqlite
+RUN chown -R www-data:www-data /var/www/storage /var/www/bootstrap/cache /var/www/database
+
+# Genera la key e esegui le migrazioni durante il build
+RUN php artisan key:generate
+RUN php artisan migrate --force
 
 EXPOSE 8000
 
-CMD php artisan key:generate && php artisan serve --host=0.0.0.0 --port=8000
+CMD php artisan serve --host=0.0.0.0 --port=8000
