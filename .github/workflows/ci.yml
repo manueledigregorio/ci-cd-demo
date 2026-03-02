@@ -1,0 +1,32 @@
+name: CI Pipeline
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout codice
+        uses: actions/checkout@v3
+
+      - name: Copia .env
+        run: cp .env.example .env
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.4'
+
+      - name: Installa dipendenze
+        run: composer install --no-interaction --prefer-dist --no-scripts
+
+      - name: Genera APP_KEY
+        run: php artisan key:generate
+
+      - name: Esegui i test
+        run: php artisan test
